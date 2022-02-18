@@ -24,16 +24,15 @@ router.post('/signup',async (req,res)=>{
     try{
         const userExist = await User.findOne({email});
         if(userExist){
-            return res.status(422).json({message:"email already exist"});
-        }
-        
+            return res.status(422).json({error:"email already exist"});
+        }  
 
         const hashPassword = await bcrypt.hash(password,12);
         const user = new User({email,password:hashPassword,name});
         await user.save();
-        return res.status(200).json({message:"sucessfully added."});
+        return res.status(200).json({success:"sucessfully added."});
     }
-    catch(err){
+    catch(err){ 
         console.log(err)
     }
     
@@ -69,15 +68,15 @@ router.post('/signin',async (req,res)=>{
 
         const userExist = await User.findOne({email});
         if(!userExist){
-            return res.status(422).json({message:"account not found"});
+            return res.status(422).json({error:"account not found"});
         }
         const orignalPassword = await bcrypt.compare(password,userExist.password);
         if(orignalPassword){
            const token =await jwt.sign({_id: userExist._id}, process.env.JWT_SECRET) ;
            res.json(token);
-            return res.status(200).json({message:"successfully signed in"});
+            return res.status(200).json({success:"successfully signed in"});
         }else{
-            return res.status(422).json({message:"credentials not matched"});
+            return res.status(422).json({error:"credentials not matched"});
         }
 
     }
